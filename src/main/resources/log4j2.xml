@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
+    <Configuration status="info" packages="com.zero.scribe.log4j2plugin"/>
+    <Properties>
+        <!--文件保存时间-->
+        <Property name="timeLimit">45d</Property>
+    </Properties>
+    <Appenders>
+        <!-- 控制台输出所有日志 -->
+        <Console name="consoleLog">
+            <PatternLayout pattern="%d{HH:mm:ss,SSS\}  [%-5p]%m%n"/>
+        </Console>
+        <!-- info文件输出 -->
+        <RollingFile name="infoLog" fileName="systemLog/info.log" append="true"
+                     filePattern="systemLog/info-%d{yyyy-MM-dd_HH}.log.gz">
+            <PatternLayout pattern="%d{HH:mm:ss,SSS\} %p %m%n"/>
+            <Filters>
+                <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
+            </Filters>
+            <Policies>
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+            </Policies>
+            <!--保留45天日志-->
+            <DefaultRolloverStrategy>   
+                <Delete basePath="systemLog" maxDepth="1">
+                    <IfFileName glob="*.log.gz"/>    
+                    <IfLastModified age="${timeLimit}"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <!-- error文件输出 -->
+        <RollingFile name="errorLog" fileName="systemLog/error.log" append="true"
+                     filePattern="systemLog/error-%d{yyyy-MM-dd_HH}.log.gz">
+            <PatternLayout pattern="%d{HH:mm:ss,SSS\}  %m%n"/>
+            <Filters>
+                <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="info" onMatch="DENY" onMismatch="NEUTRAL"/>
+            </Filters>
+            <Policies>
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+
+
+    <Loggers>
+        <logger name="infoLog" additivity="TRUE" level="info">
+            <AppenderRef ref="infoLog"/>
+        </logger>
+        <logger name="errorLog" additivity="TRUE" level="error">
+            <AppenderRef ref="errorLog"/>
+        </logger>
+        <Root level="Info">
+            <AppenderRef ref="consoleLog"/>
+        </Root>
+    </Loggers>
+
+</log4j:configuration>
