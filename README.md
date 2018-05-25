@@ -16,8 +16,8 @@
        demo2（多个sheet导出）
 使用过程
 --
-        ![img](https://github.com/LiJie298/jsonExcelDemo/dis/postman.png)
-        ![img](https://github.com/LiJie298/jsonExcelDemo/dis/excel.png)
+        ![postman](https://github.com/LiJie298/jsonExcelDemo/blob/master/dis/postman.png)
+        ![result](https://github.com/LiJie298/jsonExcelDemo/blob/master/dis/excel.png)
 
 
 
