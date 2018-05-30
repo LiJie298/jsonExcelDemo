@@ -8,8 +8,17 @@ package com.lijie.excelFile;
  * 导出或者导入模板的表头信息
  */
 public class ExcelTitleTem {
+    /**
+     * 文件标题字段
+     */
     private String titleName;
+    /**
+     * json -> excel 时对应的json的key值
+     */
     private String dateName;
+    /**
+     * excel -> json 时 对应的json字段
+     */
     private String imDateName;
 
     public ExcelTitleTem() {

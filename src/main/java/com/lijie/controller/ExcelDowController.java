@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+
 import java.io.File;
 
 import java.io.ByteArrayOutputStream;
@@ -20,12 +22,13 @@ import java.io.IOException;
  * @Description
  * @modified By
  */
-@RestController(value = "/")
+@Controller
+@RequestMapping("/download")
 public class ExcelDowController {
     @Autowired
     private ExcelDowService excelDowService;
 
-    @RequestMapping(value = "/downloadFile", method = RequestMethod.POST)
+    @RequestMapping(value = "/jsonToFile", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<byte[]> down(@RequestBody JSONObject jsonObject) {
         HttpHeaders headers = new HttpHeaders();
@@ -35,18 +38,17 @@ public class ExcelDowController {
         headers.setContentDispositionFormData("excel", System.currentTimeMillis() + ".xls");
         ExcelFile file = new ExcelFile(jsonObject.getString("type"));
         ByteArrayOutputStream byteArrayOutputStream = excelDowService.exportFile(file, jsonObject);
-
+//        try {
+//            File file1 = new File("12NEW.xlsx");
+//            FileOutputStream fileOutputStream = new FileOutputStream(file1);
+//            fileOutputStream.write(byteArrayOutputStream.toByteArray());
+//            fileOutputStream.flush();
+//            fileOutputStream.close();
+//            byteArrayOutputStream.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         byte[] body = byteArrayOutputStream.toByteArray();
-        try {
-            File file1 = new File("12NEW.xlsx");
-            FileOutputStream fileOutputStream = new FileOutputStream(file1);
-            fileOutputStream.write(byteArrayOutputStream.toByteArray());
-            fileOutputStream.flush();
-            fileOutputStream.close();
-            byteArrayOutputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         return ResponseEntity.ok().headers(headers).body(body);
 
     }

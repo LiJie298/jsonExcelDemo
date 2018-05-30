@@ -5,7 +5,6 @@ import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.ss.util.NumberToTextConverter;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -14,8 +13,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author lijie7
@@ -31,8 +28,8 @@ public class ExcelFileUtil {
      * @param cell
      * @return
      */
-    public static String getCellValue(Cell cell) {
-        String cellvalue = "";
+    public static Object getCellValue(Cell cell) {
+        Object cellvalue = "";
         if (cell != null) {
             // 判断当前Cell的Type
             switch (cell.getCellType()) {
@@ -45,10 +42,9 @@ public class ExcelFileUtil {
                         double value = cell.getNumericCellValue();
                         Date date = DateUtil.getJavaDate(value);
                         cellvalue = sdf.format(date);
-                    }
-                    // 判断当前的cell是否为Date
-                    else if (HSSFDateUtil.isCellDateFormatted(cell)) {
-                        //先注释日期类型的转换，在实际测试中发现HSSFDateUtil.isCellDateFormatted(cell)只识别2014/02/02这种格式。
+                    }else if (HSSFDateUtil.isCellDateFormatted(cell)) {
+                        // 判断当前的cell是否为Date
+                        // 先注释日期类型的转换，在实际测试中发现HSSFDateUtil.isCellDateFormatted(cell)只识别2014/02/02这种格式。
                         // 如果是Date类型则，取得该Cell的Date值
                         // 对2014-02-02格式识别不出是日期格式
                         Date date = cell.getDateCellValue();
@@ -56,7 +52,7 @@ public class ExcelFileUtil {
                         cellvalue = formater.format(date);
                     } else {
                         // 如果是纯数字 取得当前Cell的数值
-                        cellvalue = NumberToTextConverter.toText(cell.getNumericCellValue());
+                        cellvalue = cell.getNumericCellValue();
                     }
                     break;
                 }
@@ -69,14 +65,14 @@ public class ExcelFileUtil {
                     }
                     break;
                 case XSSFCell.CELL_TYPE_BLANK:
-                    cellvalue = " ";
+                    cellvalue = null;
                     break;
                 // 默认的Cell值
                 default:
-                    cellvalue = " ";
+                    cellvalue = null;
             }
         } else {
-            cellvalue = " ";
+            cellvalue = null;
         }
         return cellvalue;
     }
@@ -114,7 +110,7 @@ public class ExcelFileUtil {
      * @param cell
      * @return
      */
-    public static String getMergedRegionValue(Sheet sheet, Cell cell) {
+    public static Object getMergedRegionValue(Sheet sheet, Cell cell) {
         int row = cell.getRowIndex(), column = cell.getColumnIndex();
         int sheetMergeCount = sheet.getNumMergedRegions();
         for (int i = 0; i < sheetMergeCount; i++) {
@@ -135,38 +131,6 @@ public class ExcelFileUtil {
     }
 
 
-    /**
-     * 获取excel头部 的年份和月份
-     *
-     * @param sheet
-     * @param cell
-     * @return
-     */
-    public static String getYearAndMonthStr(Sheet sheet, XSSFCell cell) throws Exception {
-        String yearAndMonthStr = "";
-        try {
-            int column = cell.getColumnIndex();
-            if (ExcelFileUtil.isMergedRegion(sheet, 0, column)) {
-                yearAndMonthStr = ExcelFileUtil.getMergedRegionValue(sheet, sheet.getRow(0).getCell(column));
-            } else {
-                yearAndMonthStr = ExcelFileUtil.getCellValue(sheet.getRow(0).getCell(column));
-            }
-            yearAndMonthStr = yearAndMonthStr.replace("年", "/").replace("月", "").replace("-", "/");
-            Matcher isMatches = Pattern.compile("[0-9]{4}/[0-9]{1,2}").matcher(yearAndMonthStr);
-            if (isMatches.find()) {
-                yearAndMonthStr = isMatches.group(0);
-                String year = yearAndMonthStr.split("/")[0];
-                String mon = yearAndMonthStr.split("/")[1].length() > 1 ? yearAndMonthStr.split("/")[1] : "0" + yearAndMonthStr.split("/")[1];
-                yearAndMonthStr = year + "/" + mon;
-            } else {
-                throw new Exception("排期 年月 格式不正确，请参考(2017年01月，2017/11)修改");
-            }
-
-        } catch (Exception e) {
-            throw new Exception("排期 年月 格式不正确，请参考 (2017年01月，2017/11) <<--修改");
-        }
-        return yearAndMonthStr.replace("/", "-");
-    }
 
     /**
      * 设置表头风格
