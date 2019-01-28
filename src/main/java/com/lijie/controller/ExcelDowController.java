@@ -38,16 +38,16 @@ public class ExcelDowController {
         headers.setContentDispositionFormData("excel", System.currentTimeMillis() + ".xls");
         ExcelFile file = new ExcelFile(jsonObject.getString("type"));
         ByteArrayOutputStream byteArrayOutputStream = excelDowService.exportFile(file, jsonObject);
-//        try {
-//            File file1 = new File("12NEW.xlsx");
-//            FileOutputStream fileOutputStream = new FileOutputStream(file1);
-//            fileOutputStream.write(byteArrayOutputStream.toByteArray());
-//            fileOutputStream.flush();
-//            fileOutputStream.close();
-//            byteArrayOutputStream.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            File file1 = new File("key.xlsx");
+            FileOutputStream fileOutputStream = new FileOutputStream(file1);
+            fileOutputStream.write(byteArrayOutputStream.toByteArray());
+            fileOutputStream.flush();
+            fileOutputStream.close();
+            byteArrayOutputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         byte[] body = byteArrayOutputStream.toByteArray();
         return ResponseEntity.ok().headers(headers).body(body);
 

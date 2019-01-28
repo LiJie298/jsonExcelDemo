@@ -13,7 +13,6 @@ import org.springframework.context.annotation.ComponentScan;
  * @modified By
  */
 @SpringBootApplication(exclude={DataSourceAutoConfiguration.class,HibernateJpaAutoConfiguration.class})
-@ComponentScan(basePackages = {"com.lijie"})
 public class Mainstart {
     public static void main(String[] args) {
         SpringApplication.run(Mainstart.class, args);
